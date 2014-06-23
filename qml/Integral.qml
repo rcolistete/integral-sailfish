@@ -34,6 +34,17 @@ import "pages"
 
 ApplicationWindow
 {
+    property int orientation_index: 2
+    property int integralType_index : 0
+    property int numDimensions_index : 0
+    property bool showIntegral: true
+    property bool showTime: true
+    property string numDigText: '15'
+    property int numerIntegralType_index : 1
+    property int simplifyResult_index: 2
+    property int outputTypeResult_index: 1
+    property int integralScreenOrientation: Orientation.Portrait | Orientation.Landscape
+
     initialPage: Component { FirstPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
 }

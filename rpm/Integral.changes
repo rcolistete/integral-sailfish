@@ -1,0 +1,29 @@
+# Rename this file as Integral.changes to include changelog
+# entries in your RPM file.
+#
+# Add new changelog entries following the format below.
+# Add newest entries to the top of the list.
+# Separate entries from eachother with a blank line.
+
+# * date Author's Name <author's email> version-release
+# - Summary of changes
+
+* Mon Jun 23 2014 Roberto Colistete Jr. <roberto.colistete@gmail.com> - 0.8.0
+- Integral v0.8 (23/06/2014) for Sailfish :
+-  * integrals in one, two and three variables (1D, 2D, 3D);
+-  * indefinite, definite and numerical integration methods;
+-  * 3 numerical integration methods and arbitrary number of digits (default is 15);
+
+* Sun Jun 22 2014 Roberto Colistete Jr. <roberto.colistete@gmail.com> - 0.7.0
+- Integral v0.7 (22/06/2014) for Sailfish :
+-  * disabled automatic upper case in virtual keyboard;
+-  * warning that all results are copied to clipboard;
+-  * "Help" shows that beta and gamma can't be used as variables;
+-  * "Settings" menu implemented with many options : numerical method,
+     simplification method, output type, show calculation time, etc;
+-  * portrait and landscape modes.
+
+* Mon May 19 2014 Roberto Colistete Jr. <roberto.colistete@gmail.com> - 0.6.2
+- Integral v0.6 (19/05/2014) for Sailfish :
+-  * first public release for Sailfish.
+

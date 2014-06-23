@@ -13,8 +13,8 @@ Name:       Integral
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    My SailfishOS Application
-Version:    0.6
-Release:    2
+Version:    0.8
+Release:    0
 Group:      Qt/Qt
 License:    LGPLv3
 URL:        http://www.robertocolistete.net/integral/

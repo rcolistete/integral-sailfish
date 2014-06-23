@@ -19,7 +19,6 @@ SOURCES += src/Integral.cpp
 OTHER_FILES += qml/Integral.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
-    rpm/Integral.changes.in \
     rpm/Integral.spec \
     rpm/Integral.yaml \
     translations/*.ts \
@@ -27,7 +26,9 @@ OTHER_FILES += qml/Integral.qml \
     qml/pages/integral.py \
     qml/pages/HelpPage.qml \
     qml/pages/AboutPage.qml \
-    qml/pages/DejaVuSansMono.ttf
+    qml/pages/DejaVuSansMono.ttf \
+    qml/pages/SettingsPage.qml \
+    rpm/Integral.changes
 
 # to disable building translations every time, comment out the
 # following CONFIG line

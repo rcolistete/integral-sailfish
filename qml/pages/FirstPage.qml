@@ -36,6 +36,8 @@ import io.thp.pyotherside 1.2
 Page {
     id: page
 
+    allowedOrientations: integralScreenOrientation
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         id: container
@@ -48,18 +50,17 @@ Page {
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: "About"
+                text: qsTr("About")
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
-                text: "Help"
+                text: qsTr("Help")
                 onClicked: pageStack.push(Qt.resolvedUrl("HelpPage.qml"))
             }
-/*            MenuItem {
-                text: "Settings"
+            MenuItem {
+                text: qsTr("Settings")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
-*/
         }
 
         // Place our content in a Column.  The PageHeader is always placed at the top
@@ -70,8 +71,21 @@ Page {
             spacing: Theme.paddingSmall
 
             function calculateResultIntegral() {
+                var numColumns
                 result_TextArea.text = '<FONT COLOR="LightGreen">Calculating integral...</FONT>'
-                py.call('integral.calculate_Integral', [integrand_TextField.text,diff1_TextField.text,diff2_TextField.text,diff3_TextField.text], function(result) {
+                if (orientation!==Orientation.Landscape) {
+                    numColumns=35      // Portrait
+                } else {
+                    if (Math.max(page.height,page.width) > 1000) {
+                        numColumns=60  // Landscape on Nexus 4 smartphone
+                    } else {
+                        numColumns=64  // Landscape on Jolla smartphone
+                    }
+                }
+                py.call('integral.calculate_Integral', [integrand_TextField.text,diff1_TextField.text,diff2_TextField.text,diff3_TextField.text,
+                        limSup1_TextField.text,limSup2_TextField.text,limSup3_TextField.text,limInf1_TextField.text,limInf2_TextField.text,limInf3_TextField.text,
+                        integralType_index,numDimensions_index+1,numColumns,
+                        showIntegral,showTime,numDigText,numerIntegralType_index,simplifyResult_index,outputTypeResult_index], function(result) {
                     result_TextArea.text = result;
                     result_TextArea.selectAll()
                     result_TextArea.copy()
@@ -79,76 +93,227 @@ Page {
                 })
             }
 
-            PageHeader {
-                title: qsTr("Integral")
+//            PageHeader {
+//                title: qsTr("Integral")
+//            }
+            Row {
+                ComboBox {
+                    id: integralType_ComboBox
+                    width: page.width*0.7
+                    label: qsTr("Integral type ")
+                    currentIndex: integralType_index
+                    menu: ContextMenu {
+                        MenuItem { text: qsTr("Indefinite") }
+                        MenuItem { text: qsTr("Definite") }
+                        MenuItem { text: qsTr("Numerical") }
+                        onActivated: {
+                            integralType_index = index
+                        }
+                    }
+                }
+                ComboBox {
+                    id: numDimensions_ComboBox
+                    width: page.width*0.3
+                    currentIndex: numDimensions_index
+                    menu: ContextMenu {
+                        MenuItem { text: qsTr("1D") }
+                        MenuItem { text: qsTr("2D") }
+                        MenuItem { text: qsTr("3D") }
+                        onActivated: {
+                            numDimensions_index = index
+                        }
+                    }
+                }
             }
-            TextField {
-                id: integrand_TextField
-                width: parent.width
-                label: qsTr("Integrand")
-                placeholderText: "sin(x)**10"
-                text: "sin(x)**10"
-                focus: true
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: diff1_TextField.focus = true
-            }
-            Grid {
-                id: diffs_Item
+            Row {
+                visible: integralType_index > 0
                 anchors {left: parent.left; right: parent.right}
                 width: parent.width*0.80
                 anchors.leftMargin: Theme.paddingLarge
                 anchors.rightMargin: Theme.paddingLarge
-                rows: 1
-                columns: 7
+                Label {
+                    id: upperLimit_Label
+                    text: qsTr("Upper limit")
+                }
+                TextField {
+                   id: limSup1_TextField
+                   width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.25 : 0.38) : 0.75)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: '1'
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 0) {
+                           limSup2_TextField.focus = true
+                       } else {
+                           integrand_TextField.focus = true
+                       }
+                   }
+                }
+                TextField {
+                   id: limSup2_TextField
+                   visible: numDimensions_index >= 1
+                   width: parent.width*(numDimensions_index == 1 ? 0.38 : 0.25)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: '1'
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 1) {
+                           limSup3_TextField.focus = true
+                       } else {
+                           integrand_TextField.focus = true
+                       }
+                   }
+                }
+                TextField {
+                   id: limSup3_TextField
+                   visible: numDimensions_index >= 2
+                   width: parent.width*0.25
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "1"
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: integrand_TextField.focus = true
+                }
+            }
+            Row {
+                anchors {left: parent.left; right: parent.right}
+                TextField {
+                    id: integrand_TextField
+                    width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.48 : 0.57) : 0.73)
+                    label: qsTr("Integrand")
+                    placeholderText: "sin(x)**10"
+                    text: "sin(x)**10"
+                    EnterKey.enabled: text.length > 0
+                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                    EnterKey.onClicked: diff1_TextField.focus = true
+                }
                 Label {
                     id: diff1_Label
-                    text: "d"
+                    text: qsTr("d")
                 }
                 TextField {
                    id: diff1_TextField
-                   width: parent.width*0.20
+                   width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.14 : 0.18) : 0.24)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
                    text: "x"
                    EnterKey.enabled: text.length > 0
                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                   EnterKey.onClicked: diff2_TextField.focus = true
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 0) {
+                           diff2_TextField.focus = true
+                       } else if (integralType_index > 0) {
+                           limInf1_TextField.focus = true
+                       } else {
+                           calculate_Button.focus = true
+                       }
+                   }
                 }
                 Label {
                     id: diff2_Label
-                    text: "d"
+                    visible: numDimensions_index >= 1
+                    text: qsTr("d")
                 }
                 TextField {
                    id: diff2_TextField
-                   width: parent.width*0.20
-                   text: ""
+                   visible: numDimensions_index >= 1
+                   width: parent.width*(numDimensions_index == 1 ? 0.18 : 0.14)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "y"
                    EnterKey.enabled: text.length > 0
                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                   EnterKey.onClicked: diff3_TextField.focus = true
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 1) {
+                           diff3_TextField.focus = true
+                       } else if (integralType_index > 0) {
+                           limInf1_TextField.focus = true
+                       } else {
+                           calculate_Button.focus = true
+                       }
+                   }
                 }
                 Label {
                     id: diff3_Label
-                    text: "d"
+                    visible: numDimensions_index >= 2
+                    text: qsTr("d")
                 }
                 TextField {
                    id: diff3_TextField
-                   width: parent.width*0.20
-                   text: ""
+                   visible: numDimensions_index >= 2
+                   width: parent.width*0.14
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "z"
                    EnterKey.enabled: text.length > 0
-                   EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                   EnterKey.onClicked: integral_Column.calculateResultIntegral()
-                }
-                Button {
-                    id: calculate_Button
-                    width: parent.width*0.30
-                    text: qsTr("Calculate")
-                    onClicked: integral_Column.calculateResultIntegral()
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: {
+                       if (integralType_index > 0) {
+                           limInf1_TextField.focus = true
+                       } else {
+                           calculate_Button.focus = true
+                       }
+                   }
                 }
             }
-            Separator {
-                id : integral_Separator
+            Row {
+                visible: integralType_index > 0
+                anchors {left: parent.left; right: parent.right}
+                width: parent.width*0.80
+                anchors.leftMargin: Theme.paddingLarge
+                anchors.rightMargin: Theme.paddingLarge
+                Label {
+                    id: lowerLimit_Label
+                    text: qsTr("Lower limit")
+                }
+                TextField {
+                   id: limInf1_TextField
+                   width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.25 : 0.38) : 0.77)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "0"
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 0) {
+                           limInf2_TextField.focus = true
+                       } else {
+                           calculate_Button.focus = true
+                       }
+                   }
+                }
+                TextField {
+                   id: limInf2_TextField
+                   visible: numDimensions_index >= 1
+                   width: parent.width*(numDimensions_index == 1 ? 0.38 : 0.25)
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "0"
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: {
+                       if (numDimensions_index > 1) {
+                           limInf3_TextField.focus = true
+                       } else {
+                           calculate_Button.focus = true
+                       }
+                   }
+                }
+                TextField {
+                   id: limInf3_TextField
+                   visible: numDimensions_index >= 2
+                   width: parent.width*0.25
+                   inputMethodHints: Qt.ImhNoAutoUppercase
+                   text: "0"
+                   EnterKey.enabled: text.length > 0
+                   EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                   EnterKey.onClicked: calculate_Button.focus = true
+                }
+            }
+            Button {
+                id: calculate_Button
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width*0.9
-                color: Theme.primaryColor
+                width: parent.width*0.60
+                text: qsTr("Calculate")
+                focus: true
+                onClicked: integral_Column.calculateResultIntegral()
             }
             FontLoader { id: dejavusansmono; source: "file:DejaVuSansMono.ttf" }
             TextArea {
@@ -159,7 +324,7 @@ Page {
                 font.family: dejavusansmono.name
                 font.pixelSize: Theme.fontSizeExtraSmall
                 placeholderText: "Integral calculation result"
-                text : '<FONT COLOR="LightGreen">Loading Python and SymPy, it takes some seconds...</FONT>'
+                text : '<FONT COLOR="LightGreen">All calculation results are copied to clipboard.<br>Loading Python and SymPy, it takes some seconds...</FONT>'
                 Component.onCompleted: {
                     _editor.textFormat = Text.RichText;
                 }
@@ -177,7 +342,7 @@ Page {
                     // Asynchronous module importing
                     importModule('integral', function() {
                         console.log('Python version: ' + evaluate('integral.versionPython'));
-                        result_TextArea.text='<FONT COLOR="LightGreen">Using Python version ' + evaluate('integral.versionPython') + '.</FONT>'
+                        result_TextArea.text+='<FONT COLOR="LightGreen">Using Python version ' + evaluate('integral.versionPython') + '.</FONT>'
                         console.log('SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)'));
                         result_TextArea.text+='<FONT COLOR="LightGreen">SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)') + '</FONT><br>'
                     });
@@ -196,4 +361,71 @@ Page {
             }
         }
     }
+
+    states: [
+        State {
+            name: "inLandscape"
+            when: orientation === Orientation.Landscape
+            PropertyChanges {
+                target: limSup1_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.29 : 0.435) : 0.87)
+            }
+            PropertyChanges {
+                target: limSup2_TextField
+                width: parent.width*(numDimensions_index == 1 ? 0.435 : 0.29)
+            }
+            PropertyChanges {
+                target: limSup3_TextField
+                width: parent.width*0.29
+            }
+            PropertyChanges {
+                target: integrand_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.525 : 0.605) : 0.745)
+            }
+            PropertyChanges {
+                target: limInf1_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.29 : 0.435) : 0.87)
+            }
+            PropertyChanges {
+                target: limInf2_TextField
+                width: parent.width*(numDimensions_index == 1 ? 0.435 : 0.29)
+            }
+            PropertyChanges {
+                target: limInf3_TextField
+                width: parent.width*0.29
+            }
+        },
+        State {
+            name: "inPortrait"
+            when: orientation === Orientation.Portrait
+            PropertyChanges {
+                target: limSup1_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.25 : 0.38) : 0.75)
+            }
+            PropertyChanges {
+                target: limSup2_TextField
+                width: parent.width*(numDimensions_index == 1 ? 0.38 : 0.25)
+            }
+            PropertyChanges {
+                target: limSup3_TextField
+                width: parent.width*0.25
+            }
+            PropertyChanges {
+                target: integrand_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.48 : 0.57) : 0.73)
+            }
+            PropertyChanges {
+                target: limInf1_TextField
+                width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.25 : 0.38) : 0.75)
+            }
+            PropertyChanges {
+                target: limInf2_TextField
+                width: parent.width*(numDimensions_index == 1 ? 0.38 : 0.25)
+            }
+            PropertyChanges {
+                target: limInf3_TextField
+                width: parent.width*0.25
+            }
+        }
+    ]
 }
