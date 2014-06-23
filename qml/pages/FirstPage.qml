@@ -182,6 +182,7 @@ Page {
                 TextField {
                     id: integrand_TextField
                     width: parent.width*(numDimensions_index >= 1 ? (numDimensions_index == 2 ? 0.48 : 0.57) : 0.73)
+                    inputMethodHints: Qt.ImhNoAutoUppercase
                     label: qsTr("Integrand")
                     placeholderText: "sin(x)**10"
                     text: "sin(x)**10"
