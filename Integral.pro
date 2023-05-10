@@ -12,9 +12,7 @@
 # The name of your application
 TARGET = Integral
 
-CONFIG += sailfishapp
-
-SOURCES += src/Integral.cpp
+CONFIG += sailfishapp_qml
 
 OTHER_FILES += qml/Integral.qml \
     qml/cover/CoverPage.qml \

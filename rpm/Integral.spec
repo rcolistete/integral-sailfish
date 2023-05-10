@@ -13,17 +13,17 @@ Name:       Integral
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Integral
-Version:    0.8
+Version:    0.9.0
 Release:    1
 Group:      Qt/Qt
 License:    LGPLv3
 URL:        http://www.robertocolistete.net/integral/
 Source0:    %{name}-%{version}.tar.bz2
-Source100:  Integral.yaml
+BuildArch:  noarch
+Requires:   libsailfishapp-launcher
 Requires:   sailfishsilica-qt5 >= 0.10.9
-Requires:   mapplauncherd-booster-silica-qt5
-Requires:   python3-base
 Requires:   pyotherside-qml-plugin-python3-qt5 >= 1.2
+Requires:   python3-base
 Requires:   python3-sympy
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(qdeclarative5-boostable)
@@ -35,6 +35,19 @@ BuildRequires:  desktop-file-utils
 %description
 Integral - Calculation of mathematical integrals using Python & SymPy module
 
+%if "%{?vendor}" == "chum"
+Title: Integral
+Type: desktop-application
+Categories:
+ - Science
+ - Utility
+DeveloperName: Roberto Colistete
+PackagedBy: Mark Washeim (poetaster)
+Custom:
+ - Repo: https://github.com/rcolistete/integral-sailfish
+ - PackagingRepo: https://github.com/poetaster/integral-sailfish
+ PackageIcon: https://github.com/poetaster/integral-sailfish/blob/c80a621e04bbf247139c393b5776eb717be0e206/Integral.png
+%endif
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -68,7 +81,6 @@ desktop-file-install --delete-original       \
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/86x86/apps/%{name}.png
