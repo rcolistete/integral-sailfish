@@ -11,7 +11,7 @@ timet1=time.time()
 from sympy import *
 from sympy import __version__
 from sympy.integrals import *
-from sympy.mpmath import *
+from mpmath import *
 from sympy.interactive.printing import init_printing
 from sympy.printing.mathml import mathml
 timet2=time.time()
