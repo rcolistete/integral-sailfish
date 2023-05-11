@@ -41,8 +41,8 @@ Page {
     SilicaFlickable {
         id: container
         anchors.fill: parent
-        contentHeight: contentItem.childrenRect.height
-        contentWidth: page.width
+        height: childrenRect.height
+        width: page.width
 
         VerticalScrollDecorator { flickable: container }
 
@@ -59,6 +59,16 @@ Page {
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+            }
+        }
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("Copy result")
+                onClicked: Clipboard.text = result_TextArea.text
+            }
+            MenuItem {
+                text: qsTr("Copy formula")
+                onClicked: Clipboard.text = expression_TextField.text
             }
         }
 
@@ -86,9 +96,9 @@ Page {
                         integralType_index,numDimensions_index+1,numColumns,
                         showIntegral,showTime,numDigText,numerIntegralType_index,simplifyResult_index,outputTypeResult_index], function(result) {
                     result_TextArea.text = result;
-                    result_TextArea.selectAll()
-                    result_TextArea.copy()
-                    result_TextArea.deselect()
+                    //result_TextArea.selectAll()
+                    //result_TextArea.copy()
+                    //result_TextArea.deselect()
                 })
             }
 
@@ -315,18 +325,29 @@ Page {
                 focus: true
                 onClicked: integral_Column.calculateResultIntegral()
             }
-            FontLoader { id: dejavusansmono; source: "file:DejaVuSansMono.ttf" }
+            FontLoader { id: dejavusansmono; source: "DejaVuSansMono.ttf" }
             TextArea {
                 id: result_TextArea
-                height: Math.max(page.width, 600, implicitHeight)
+                height: Math.max(page.width, 1024, implicitHeight)
                 width: parent.width
                 readOnly: true
                 font.family: dejavusansmono.name
                 font.pixelSize: Theme.fontSizeExtraSmall
                 placeholderText: "Integral calculation result"
-                text : '<FONT COLOR="LightGreen">All calculation results are copied to clipboard.<br>Loading Python and SymPy, it takes some seconds...</FONT>'
+                text : '<FONT COLOR="LightGreen">Loading Python and SymPy, it takes some seconds...</FONT>'
                 Component.onCompleted: {
                     _editor.textFormat = Text.RichText;
+                }
+
+                /* for the cover we hold the value */
+                onTextChanged: { resultText = scaleText(text) }
+
+                /* for the cover we scale font px values */
+                function scaleText(text) {
+                    //console.log(text)
+                    const re0 = /36px/g;
+                    const newtxt = text.replace(re0, "16px")
+                    return newtxt
                 }
             }
 
