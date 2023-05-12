@@ -3,5 +3,9 @@ Type=Application
 X-Nemo-Application-Type=silica-qt5
 Name=Integral
 Icon=Integral
-Exec=Integral
+Exec=/usr/bin/sailfish-qml Integral
 
+[X-Sailjail]
+Permissions=UserDirs
+OrganizationName=com.wordpress.robertocolistete
+ApplicationName=Integral
