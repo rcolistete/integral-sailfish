@@ -41,7 +41,7 @@ Page {
     SilicaFlickable {
         id: container
         anchors.fill: parent
-        height: childrenRect.height
+        height: integral_Column.height  //Theme.paddingLarge
         width: page.width
 
         VerticalScrollDecorator { flickable: container }
@@ -77,18 +77,19 @@ Page {
         Column {
             id : integral_Column
             width: page.width
+            height:  childrenRect.height
             spacing: Theme.paddingSmall
 
             function calculateResultIntegral() {
                 var numColumns
-                result_TextArea.text = '<FONT COLOR="LightGreen">Calculating integral...</FONT>'
-                if (orientation!==Orientation.Landscape) {
-                    numColumns=35      // Portrait
+                result_TextArea.text = 'Calculating ...'
+                if (orientation==Orientation.Portrait) {
+                    numColumns=42      // Portrait
                 } else {
                     if (Math.max(page.height,page.width) > 1000) {
-                        numColumns=60  // Landscape on Nexus 4 smartphone
+                        numColumns=100  // Landscape on Nexus 4 smartphone
                     } else {
-                        numColumns=64  // Landscape on Jolla smartphone
+                        numColumns=80  // Landscape on Jolla smartphone
                     }
                 }
                 py.call('integral.calculate_Integral', [integrand_TextField.text,diff1_TextField.text,diff2_TextField.text,diff3_TextField.text,
@@ -325,29 +326,46 @@ Page {
                 focus: true
                 onClicked: integral_Column.calculateResultIntegral()
             }
-            FontLoader { id: dejavusansmono; source: "DejaVuSansMono.ttf" }
+
+            FontLoader {
+                id: dejavusansmono
+                source: "DejaVuSansMono.ttf"
+            }
+
+            Label {
+               id:timer
+               anchors.horizontalCenter: parent.horizontalCenter
+               width: parent.width*0.50
+               //width: parent.width  - Theme.paddingLarge
+               text: timerInfo
+               color: Theme.highlightColor
+            }
+
             TextArea {
                 id: result_TextArea
-                height: Math.max(page.width, 1024, implicitHeight)
+                //height: Math.max(page.width, 800, implicitHeight)
                 width: parent.width
                 readOnly: true
                 font.family: dejavusansmono.name
                 font.pixelSize: Theme.fontSizeExtraSmall
+                color:'lightblue'
                 placeholderText: "Integral calculation result"
-                text : '<FONT COLOR="LightGreen">Loading Python and SymPy, it takes some seconds...</FONT>'
+                text : 'Loading Python and SymPy ...'
                 Component.onCompleted: {
-                    _editor.textFormat = Text.RichText;
+                   // _editor.textFormat = Text.RichText;
                 }
 
                 /* for the cover we hold the value */
-                onTextChanged: { resultText = scaleText(text) }
-
+                onTextChanged: {
+                    console.log(implicitHeight)
+                    resultText = scaleText(text)
+                }
                 /* for the cover we scale font px values */
+                /* on the cover we can use html */
                 function scaleText(text) {
-                    //console.log(text)
-                    const re0 = /36px/g;
-                    const newtxt = text.replace(re0, "16px")
-                    return newtxt
+                    const txt = '<FONT COLOR="lightblue" SIZE="10px"><pre>'
+                    txt = txt + text + '<pre></FONT>'
+                    return txt
                 }
             }
 
@@ -360,13 +378,24 @@ Page {
                     addImportPath(pythonpath);
                     console.log(pythonpath);
 
+                    setHandler('timerPush', timerPushHandler);
+
                     // Asynchronous module importing
                     importModule('integral', function() {
-                        console.log('Python version: ' + evaluate('integral.versionPython'));
-                        result_TextArea.text+='<FONT COLOR="LightGreen">Using Python version ' + evaluate('integral.versionPython') + '.</FONT>'
-                        console.log('SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)'));
-                        result_TextArea.text+='<FONT COLOR="LightGreen">SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)') + '</FONT><br>'
+                        result_TextArea.text='Python version ' + evaluate('integral.versionPython') + '.\n'
+                        result_TextArea.text+='SymPy version ' + evaluate('integral.versionSymPy') + '\n'
+                        timerInfo = evaluate('("loaded in %fs" % integral.loadingtimeSymPy)')
+
+                        //console.log('Python version: ' + evaluate('integral.versionPython'));
+                        //result_TextArea.text+='<FONT COLOR="LightGreen">Using Python version ' + evaluate('integral.versionPython') + '.</FONT>'
+                        //console.log('SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)'));
+                        //result_TextArea.text+='<FONT COLOR="LightGreen">SymPy version ' + evaluate('integral.versionSymPy') + evaluate('(" loaded in %f seconds." % integral.loadingtimeSymPy)') + '</FONT><br>'
                     });
+                }
+
+                // shared via timerInfo with cover
+                function timerPushHandler(pTimer) {
+                    timerInfo =  pTimer + ' elapsed'
                 }
 
                 onError: {

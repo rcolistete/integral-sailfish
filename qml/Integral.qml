@@ -44,6 +44,7 @@ ApplicationWindow
     property int simplifyResult_index: 2
     property int outputTypeResult_index: 1
     property string resultText: ''
+    property string timerInfo: ''
     property int integralScreenOrientation: Orientation.Portrait | Orientation.Landscape
 
     initialPage: Component { FirstPage { } }

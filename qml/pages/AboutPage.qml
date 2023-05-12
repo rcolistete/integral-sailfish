@@ -8,7 +8,7 @@ Page {
 
     Item {
         id: aboutInfos
-        property string version:'0.8'
+        property string version:'0.9.2'
         property string text: if(orientation === Orientation.Portrait) {
                                   '<style>a:link { color: ' + Theme.primaryColor  + '; }</style>' +
                                   'Integral calculates mathematical<br>indefinite and definite integrals,<br>symbolically and numerically.' +
@@ -17,7 +17,7 @@ Page {
                                   '<br>Free & Open Source :' +
                                   '<br><a href="http://www.gnu.org/licenses/lgpl-3.0.html"><b>License LGPLv3</b></a>' +
                                   '<br><br>For more information, see the web site :' +
-                                  '<br><a href="http://www.RobertoColistete.net/Limit"><b>www.RobertoColistete.net/Limit</b></a>' +
+                                  '<br><a href="https://github.com/rcolistete/integral-sailfish"><b>Integral</b></a>' +
                                   '<br><br><FONT COLOR="violet">In l&hearts;ving memory of my wife Lorena</FONT>'
                                } else {
                                   '<style>a:link { color: ' + Theme.primaryColor  + '; }</style>' +
@@ -27,7 +27,7 @@ Page {
                                   '<br>Free & Open Source :' +
                                   '<br><a href="http://www.gnu.org/licenses/lgpl-3.0.html"><b>License LGPLv3</b></a>' +
                                   '<br><br>For more information, see the web site :' +
-                                  '<br><a href="http://www.RobertoColistete.net/Integral"><b>www.RobertoColistete.net/Integral</b></a>' +
+                                  '<br><a href="https://github.com/rcolistete/integral-sailfish"><b>Integral</b></a>' +
                                   '<br><br><FONT COLOR="violet">In l&hearts;ving memory of my wife Lorena</FONT>'
                               }
     }

@@ -188,14 +188,19 @@ def calculate_Integral(expression,var1,var2,var3,varSup1,varSup2,varSup3,varInf1
             resultOutput = python(resultIntegralSimp)
 
     if showTime and (timeIntegral > 0.0):
-        result = '<FONT COLOR="LightGreen">'+("Calculated after %f s :" % timeIntegral)+'</FONT><br>'
+        pyotherside.send("timerPush", timeIntegral)
+        result = u'\n\n'
+        #result = '<FONT COLOR="LightGreen">'+("Calculated after %f s :" % timeIntegral)+'</FONT><br>'
     else:
-        result = u""
+        result = u'\n\n'
     if showIntegral and nonCalculatedIntegralOutput:
-        result += u'<FONT COLOR="LightBlue">'+(nonCalculatedIntegralOutput.replace(' ','&nbsp;')).replace("\n","<br>")+'<br>=</FONT><br>'
+        result+= nonCalculatedIntegralOutput + '\n\n'
+        #result += u'<FONT COLOR="LightBlue">'+(nonCalculatedIntegralOutput.replace(' ','&nbsp;')).replace("\n","<br>")+'<br>=</FONT><br>'
     if (type(resultIntegralSimp) != str):
-        result += (resultOutput.replace(' ','&nbsp;')).replace("\n","<br>")
+        result += resultOutput + '\n'
+        #result += (resultOutput.replace(' ','&nbsp;')).replace("\n","<br>")
     else:
-        result += u'<FONT COLOR="Red">'+((resultOutput.replace(' ','&nbsp;')).replace("\n","<br>"))+'</FONT>'
+        result += resultOutput
+        #result += u'<FONT COLOR="Red">'+((resultOutput.replace(' ','&nbsp;')).replace("\n","<br>"))+'</FONT>'
     return result
 
